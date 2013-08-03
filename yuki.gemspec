@@ -25,4 +25,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency("sinatra-contrib", "1.4.0")
   gem.add_dependency("vegas", "0.1.11")
   gem.add_dependency("sequel")
+  gem.add_dependency("mysql")
+
+  gem.add_dependency("ruby-graphviz")
+
+  
 end

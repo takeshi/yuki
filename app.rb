@@ -3,17 +3,23 @@ require "multi_json"
 require "sinatra/base"
 require "sinatra/json"
 
-require "./config/main"
+require 'logger'
 
 class App < Sinatra::Base
   helpers Sinatra::JSON
+  @@logger = Logger.new(STDOUT)
 
-  get "/" do
-    send_file File.join(settings.public_folder, "index.html")
+  def self.logger
+  	@@logger
   end
-
-  get "/app/products.json" do
-    json [{name: "iPad"}, {name: "Nexus 7"}, {name: "Samsung S4"}]
+  
+  def self.inherited(base)
+    p "extended object #{base.inspect}"
   end
 
 end
+
+require "./config/settings"
+require "./util/RequireUtil"
+require "./config/db"
+RequireUtil.loadDir("LoadController",__dir__ + "/controller")

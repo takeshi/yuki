@@ -39,18 +39,21 @@ end
 
   desc "Perform Sequel migration to database"
   task :migrate do
-    config_file = ENV["CLOUD_CONTROLLER_NG_CONFIG"]
-    config_file ||= File.expand_path("../config/cloud_controller.yml", __FILE__)
 
-    config = VCAP::CloudController::Config.from_file(config_file)
-    VCAP::CloudController::Config.db_encryption_key = config[:db_encryption_key]
+    require "./config/db"
 
-    Steno.init(Steno::Config.new(:sinks => [Steno::Sink::IO.new(STDOUT)]))
-    db_logger = Steno.logger("db.migrations")
+    m = ARGV.last
+    db = DB.name
 
-    db = VCAP::CloudController::DB.connect(db_logger, config[:db])
-    VCAP::CloudController::DB.apply_migrations(db)
+    if m  =~ /^[-+]?[0-9]+$/
+      exec "bundle exec sequel -m ./db/migrations -M #{m} #{db} -E "
+    else
+      exec "bundle exec sequel -m ./db/migrations #{db} -E "
+    end
+  end
+
+  task :html do
+    exec "java -jar lib/schemaSpy_5.0.0.jar  -dp lib/mysql-connector-java-5.1.25.jar -t mysql -db yuki -host localhost -port 3306 -u root -p root -charset UTF-8 -o ./db/html"
   end
 
 end
-
